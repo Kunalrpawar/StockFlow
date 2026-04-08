@@ -13,27 +13,6 @@ Production-style Flask backend case study covering:
 - Flask-Migrate (Alembic)
 - Pytest
 
-## Project Structure
-
-```
-stockflow/
-  app/
-    models/
-    routes/
-    services/
-    utils/
-    __init__.py
-    extensions.py
-    seed.py
-  config/
-    settings.py
-  migrations/
-  tests/
-  run.py
-  requirements.txt
-  README.md
-```
-
 ## Setup
 
 ### Quick Start (5 minutes)
@@ -191,28 +170,6 @@ The Dockerfile uses gunicorn with 4 workers. For production:
 4. Enable HTTPS/TLS
 5. Set up monitoring and logging
 
-## Project Structure Reference
-
-- **app/** - Application code (models, routes, services, utils)
-- **app/models/** - SQLAlchemy ORM definitions
-- **app/routes/** - Flask blueprints for API endpoints
-- **app/services/** - Business logic and database operations
-- **app/utils/** - Validation, error handling, response formatting
-- **config/** - Configuration management
-- **tests/** - Pytest test suite
-- **migrations/** - Alembic database migration scripts
-- **.github/workflows/** - GitHub Actions CI/CD pipelines
-- **Makefile** - Development command shortcuts
-- **pyproject.toml** - Python project configuration and tool settings
-- **.pre-commit-config.yaml** - Pre-commit hook configuration
-- **.editorconfig** - Editor formatting standards
-- **docker-compose.yml** - Docker multi-container setup
-- **Dockerfile** - Container image definition
-- **.gitignore** - Version control exclusions
-- **.env.example** - Environment variables template
-- **CONTRIBUTING.md** - Contribution guidelines
-- **CHANGELOG.md** - Release history and changes
-- **LICENSE** - MIT License
 
 ## Testing the API
 
@@ -385,45 +342,6 @@ Included tests:
 - Why inventory is modeled separately from products for multi-warehouse support.
 - Tradeoffs in threshold fallback and supplier prioritization.
 - Index choices for low-stock query performance.
-
-## Good Coding Practices Included
-
-This repository demonstrates production-level best practices:
-
-### Version Control
-- Comprehensive `.gitignore` for Python/Flask projects
-- Clean commit history with conventional commit messages
-
-### Project Configuration
-- **pyproject.toml** - Centralized tool configuration (black, ruff, pytest, coverage)
-- **Makefile** - Convenient development commands
-- **.editorconfig** - Consistent formatting across editors
-- **.env.example** - Environment variable template
-
-### Code Quality
-- **Pre-commit hooks** - Automatic linting, formatting, and validation
-- **Black** - Opinionated code formatting
-- **Ruff** - Fast Python linter with auto-fix
-- **isort** - Import statement organization
-- **mypy** - Static type checking
-- **Pytest** - Testing framework with coverage
-
-### CI/CD
-- **GitHub Actions** - Automated testing and linting on push/PR
-- **Multi-version testing** - Tests run on Python 3.11 and 3.12
-- **Code coverage** - Integrated Codecov reporting
-
-### Containerization
-- **Dockerfile** - Production-ready container image
-- **docker-compose.yml** - Local development with PostgreSQL
-- **.dockerignore** - Optimized image build
-
-### Documentation
-- **README.md** - Comprehensive setup and API documentation
-- **CONTRIBUTING.md** - Guidelines for contributors
-- **CHANGELOG.md** - Release history and version tracking
-- **LICENSE** - MIT License
-- **Code comments** - Minimal but strategic comments
 
 ### Development Workflow
 ```bash
