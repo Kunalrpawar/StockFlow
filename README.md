@@ -36,36 +36,223 @@ stockflow/
 
 ## Setup
 
-1. Create virtual environment and install dependencies:
+### Quick Start (5 minutes)
+
 ```bash
-python -m venv .venv
-.venv\\Scripts\\activate
-pip install -r requirements.txt
+# 1. Activate venv
+.venv\Scripts\activate
+
+# 2. Initialize database
+python manage.py init
+
+# 3. Seed sample data
+python manage.py seed
+
+# 4. Start server
+python run.py
 ```
 
-2. Configure database connection:
+Then visit:
+- **API Docs**: http://localhost:5000/
+- **Health Check**: http://localhost:5000/health
+
+### Quick Start (Mac/Linux)
+
 ```bash
+source .venv/bin/activate
+python manage.py init
+python manage.py seed
+python run.py
+```
+
+### Development Setup with Pre-commit Hooks
+
+```bash
+# Install development dependencies
+pip install -e ".[dev]"
+
+# Setup pre-commit hooks
+pre-commit install
+
+# Now automatic code quality checks run on every commit
+```
+
+### Full Setup (Alternative with Alembic migrations)
+
+```bash
+# Configure PostgreSQL connection
 set DATABASE_URL=postgresql+psycopg2://postgres:postgres@localhost:5432/stockflow
-```
 
-3. Run migrations (after initializing migration environment):
-```bash
+# Initialize Alembic migrations
 set FLASK_APP=run.py
 flask db init
 flask db migrate -m "initial schema"
 flask db upgrade
 ```
 
-4. Start server:
+## Database Management
+
+Quick database commands without PostgreSQL (uses SQLite):
+
 ```bash
-python run.py
+python manage.py init    # Create database tables
+python manage.py seed    # Load sample data
+python manage.py reset   # Drop and recreate all tables
 ```
 
-## Seed Sample Data
+With Flask CLI (requires Alembic setup):
 
 ```bash
 set FLASK_APP=run.py
-flask seed-data
+flask db init            # Initialize migration environment
+flask db migrate -m "description"  # Create migration
+flask db upgrade         # Apply migrations
+flask seed-data          # Load sample data
+```
+
+## API Endpoints Reference
+
+### Base URL
+```
+http://localhost:5000
+```
+
+### Root API Documentation
+- **GET** `/` - Returns API structure and endpoint documentation
+
+### Health Check
+- **GET** `/health` - Service health status
+
+## Code Quality & Development
+
+All commands available via `make` (or run manually):
+
+```bash
+make lint       # Check code quality (ruff, black)
+make format     # Auto-format code (black, isort, ruff)
+make test       # Run tests with coverage report
+make clean      # Remove build artifacts and cache
+make help       # Show all available commands
+```
+
+### Pre-commit Hooks
+
+Pre-commit hooks automatically format and check code before commits:
+
+```bash
+git commit -m "your message"  # Hooks run automatically
+```
+
+Hooks configured:
+- Trailing whitespace removal
+- File format fixes (json, yaml)
+- Large file detection
+- Black formatting
+- Ruff linting with auto-fix
+- isort import sorting
+- Type checking with mypy
+
+### Code Standards
+
+- **Formatter**: Black (line length 120)
+- **Linter**: Ruff + flake8
+- **Import sorter**: isort (black profile)
+- **Type checker**: mypy
+- **Test coverage**: Minimum 75%
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for detailed guidelines.
+
+## Docker Deployment
+
+### Build and Run with Docker Compose
+
+```bash
+docker-compose up -d
+docker-compose exec app flask db upgrade
+docker-compose exec app flask seed-data
+```
+
+Application available at `http://localhost:5000`
+
+### Manual Docker Build
+
+```bash
+docker build -t stockflow .
+docker run -p 5000:5000 -e DATABASE_URL=<db_url> stockflow
+```
+
+### Production Deployment
+
+The Dockerfile uses gunicorn with 4 workers. For production:
+
+1. Update `docker-compose.yml` with your PostgreSQL credentials
+2. Set proper environment variables
+3. Use a reverse proxy (nginx) in front of gunicorn
+4. Enable HTTPS/TLS
+5. Set up monitoring and logging
+
+## Project Structure Reference
+
+- **app/** - Application code (models, routes, services, utils)
+- **app/models/** - SQLAlchemy ORM definitions
+- **app/routes/** - Flask blueprints for API endpoints
+- **app/services/** - Business logic and database operations
+- **app/utils/** - Validation, error handling, response formatting
+- **config/** - Configuration management
+- **tests/** - Pytest test suite
+- **migrations/** - Alembic database migration scripts
+- **.github/workflows/** - GitHub Actions CI/CD pipelines
+- **Makefile** - Development command shortcuts
+- **pyproject.toml** - Python project configuration and tool settings
+- **.pre-commit-config.yaml** - Pre-commit hook configuration
+- **.editorconfig** - Editor formatting standards
+- **docker-compose.yml** - Docker multi-container setup
+- **Dockerfile** - Container image definition
+- **.gitignore** - Version control exclusions
+- **.env.example** - Environment variables template
+- **CONTRIBUTING.md** - Contribution guidelines
+- **CHANGELOG.md** - Release history and changes
+- **LICENSE** - MIT License
+
+## Testing the API
+
+### Manual curl commands
+
+```bash
+# Get API documentation
+curl http://localhost:5000/
+
+# Health check
+curl http://localhost:5000/health
+
+# Create product
+curl -X POST http://localhost:5000/api/products \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "Widget A",
+    "sku": "WID-001",
+    "price": "19.99",
+    "company_id": 1,
+    "warehouse_id": 1,
+    "initial_quantity": 10,
+    "low_stock_threshold": 20
+  }'
+
+# Get low-stock alerts
+curl http://localhost:5000/api/companies/1/alerts/low-stock
+```
+
+Or use:
+```bash
+python test_api.py  # Displays all test commands
+```
+
+### Run automated tests
+
+```bash
+pytest -v            # Verbose output
+pytest --cov=app     # With coverage report
+make test            # Using Makefile
 ```
 
 ## API Endpoints
@@ -198,3 +385,60 @@ Included tests:
 - Why inventory is modeled separately from products for multi-warehouse support.
 - Tradeoffs in threshold fallback and supplier prioritization.
 - Index choices for low-stock query performance.
+
+## Good Coding Practices Included
+
+This repository demonstrates production-level best practices:
+
+### Version Control
+- Comprehensive `.gitignore` for Python/Flask projects
+- Clean commit history with conventional commit messages
+
+### Project Configuration
+- **pyproject.toml** - Centralized tool configuration (black, ruff, pytest, coverage)
+- **Makefile** - Convenient development commands
+- **.editorconfig** - Consistent formatting across editors
+- **.env.example** - Environment variable template
+
+### Code Quality
+- **Pre-commit hooks** - Automatic linting, formatting, and validation
+- **Black** - Opinionated code formatting
+- **Ruff** - Fast Python linter with auto-fix
+- **isort** - Import statement organization
+- **mypy** - Static type checking
+- **Pytest** - Testing framework with coverage
+
+### CI/CD
+- **GitHub Actions** - Automated testing and linting on push/PR
+- **Multi-version testing** - Tests run on Python 3.11 and 3.12
+- **Code coverage** - Integrated Codecov reporting
+
+### Containerization
+- **Dockerfile** - Production-ready container image
+- **docker-compose.yml** - Local development with PostgreSQL
+- **.dockerignore** - Optimized image build
+
+### Documentation
+- **README.md** - Comprehensive setup and API documentation
+- **CONTRIBUTING.md** - Guidelines for contributors
+- **CHANGELOG.md** - Release history and version tracking
+- **LICENSE** - MIT License
+- **Code comments** - Minimal but strategic comments
+
+### Development Workflow
+```bash
+# One-command setup
+make install-dev
+
+# Automatic code quality
+git commit  # Pre-commit hooks run automatically
+
+# Local development
+make run    # Start dev server
+
+# Testing
+make test   # Full test suite with coverage
+
+# Production
+docker-compose up  # Or deploy container elsewhere
+```

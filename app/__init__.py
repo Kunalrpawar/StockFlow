@@ -1,7 +1,8 @@
-from flask import Flask
+from flask import Flask, jsonify
 from flask.cli import with_appcontext
 import click
 
+from app.docs import get_api_docs
 from app.extensions import db, migrate
 from app.routes.alert_routes import alert_bp
 from app.routes.product_routes import product_bp
@@ -17,6 +18,10 @@ def create_app(config_object: type[Config] = Config) -> Flask:
 
     app.register_blueprint(product_bp)
     app.register_blueprint(alert_bp)
+
+    @app.get("/")
+    def api_root():
+        return jsonify(get_api_docs()), 200
 
     @app.get("/health")
     def health_check():
